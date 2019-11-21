@@ -1,0 +1,51 @@
+name: factors_empathy_survey
+description: A survey app with the purpose of assisting in an investigation of how various factors affect a person's empathy.
+
+# The following defines the version and build number for your application.
+# A version number is three numbers separated by dots, like 1.2.43
+# followed by an optional build number separated by a +.
+# Both the version and the builder number may be overridden in flutter
+# build by specifying --build-name and --build-number, respectively.
+# Read more about versioning at semver.org.
+version: 1.0.0+1
+
+environment:
+  sdk: ">=2.4.0 <3.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  provider: ^3.1.0+1
+
+  flutter_sequence_animation: ^3.0.1
+  percent_indicator: ^2.1.1
+  grouped_buttons: ^1.0.4
+
+  hive: ^1.1.1
+  hive_flutter: ^0.2.1
+
+  path_provider: ^1.4.2
+
+  grizzly_io: ^2.2.0
+
+  flutter_cupertino_date_picker: ^1.0.12
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+
+# For information on the generic Dart part of this file, see the
+# following page: https://www.dartlang.org/tools/pub/pubspec
+
+# The following section is specific to Flutter.
+flutter:
+
+  # The following line ensures that the Material Icons font is
+  # included with your application, so that you can use the icons in
+  # the material Icons class.
+  uses-material-design: true
+
+  # To add assets to your application, add an assets section, like this:
+  assets:
+    - images/
