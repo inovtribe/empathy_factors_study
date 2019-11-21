@@ -361,7 +361,7 @@ const otherQuotientRegistrar = QuestionRegistrar<InputQuestion>.of([
   InputQuestion(2, 'On average, how much time each day do you play violent video games?', InputType.Double, Store.HOURS_VG_V, nullTest),
 ]);
 
-QuestionRegistrar<Question> get mixedRegistrar => QuestionRegistrar.of([...empathyQuotientRegistrar.registry.take(8), ...otherQuotientRegistrar.registry]..shuffle());
+QuestionRegistrar<Question> get mixedRegistrar => QuestionRegistrar.of([...empathyQuotientRegistrar.registry..shuffle(), ...otherQuotientRegistrar.registry]);
 
 class QuestionnaireState<Q extends Question> {
   /// Instantiates a [QuestionnaireState]
