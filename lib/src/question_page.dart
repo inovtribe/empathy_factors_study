@@ -66,7 +66,22 @@ class _QuestionPageState extends State<QuestionPage> with SingleTickerProviderSt
 
   Widget formInput(Question question) {
     final store = Store();
-    if (question is NumQuestion) {
+    if (question is SliderQuestion) {
+      if (!(tmp is double)) {
+        // TODO(mpfaff): Possibly remove store logic
+        tmp = store[question.key] ?? question.min ?? 0;
+      }
+
+      return Slider(
+        value: tmp,
+        onChanged: (v) => tmp = v,
+        min: question.min ?? 0,
+        max: question.max,
+        activeColor: Colors.orangeAccent,
+        divisions: question.divisions,
+      );
+    }
+    else if (question is NumQuestion) {
       if (!(tmp is String)) {
         // TODO(mpfaff): Possibly remove store logic
         tmp = store[question.key] ?? '0';
@@ -79,6 +94,7 @@ class _QuestionPageState extends State<QuestionPage> with SingleTickerProviderSt
         keyboardType: TextInputType.numberWithOptions(decimal: question.decimal, signed: question.signed),
         onChanged: (_) => tmp = controller.value.text,
         controller: controller,
+        decoration: InputDecoration(hintText: question.hint),
       );
     } else if (question is StringQuestion) {
       if (!(tmp is String)) {
@@ -92,6 +108,7 @@ class _QuestionPageState extends State<QuestionPage> with SingleTickerProviderSt
         textInputAction: TextInputAction.done,
         onChanged: (_) => tmp = controller.value.text,
         controller: controller,
+        decoration: InputDecoration(hintText: question.hint),
       );
     } else if (question is BooleanQuestion) {
       if (!(tmp is Ternary)) {
