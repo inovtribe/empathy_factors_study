@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 import 'util.dart';
 
 String nullTest(dynamic value) => value == null ? 'Must not be null.' : null;
+String emptyTest(dynamic value) => value == null || value.isEmpty ? 'Must not be empty.' : null;
 
 class Response {
   const Response(this.label, this.when, this.value);
@@ -324,9 +325,10 @@ QuestionRegistrar<EQQuestion> get distractedEmpathyQuotientRegistrar => Question
 
 
 const correlationRegistrar = QuestionRegistrar<Question>.of([
-  NumQuestion(1, 1, 'On average, how much time each day do you play video games?', nullTest, decimal: true),
-  NumQuestion(2, 2, 'On average, how much time each day do you play violent video games?', nullTest, decimal: true),
-  NumQuestion(3, 3, 'If a person you\'ve never met before bumped into you hard in a supermarket, how likely would you be to shout, shove or swear at them.', nullTest, decimal: true),
+  NumQuestion(1, 1, 'On average, how much time each day do you play video games?', emptyTest, decimal: true, max: 24, hint: 'Hours'),
+  NumQuestion(2, 2, 'On average, how much time each day do you play violent video games?', emptyTest, decimal: true, max: 24, hint: 'Hours'),
+  NumQuestion(3, 3, 'If put in an empty room, how long would you take to resort to self harm for stimulation', emptyTest, decimal: true, hint: 'Minutes'),
+  NumQuestion(4, 4, 'What is your age?', emptyTest, hint: 'Years'),
 ]);
 
 QuestionRegistrar<Question> get mixedRegistrar => QuestionRegistrar.of([...empathyQuotientRegistrar.registry.toList()..shuffle(), ...correlationRegistrar.registry]);
@@ -422,14 +424,27 @@ class EQQuestion extends Question {
 }
 
 class NumQuestion extends Question {
-  const NumQuestion(int key, int number, String question, ValueTest test, {this.decimal = false, this.signed = false}) : super(key, number, question, test);
+  const NumQuestion(int key, int number, String question, ValueTest test, {this.decimal = false, this.hint, this.signed = false, this.min, this.max}) : super(key, number, question, test);
 
   final bool decimal;
   final bool signed;
+
+  final num min;
+  final num max;
+
+  final String hint;
+}
+
+class SliderQuestion extends NumQuestion {
+  SliderQuestion(int key, int number, String question, ValueTest test, {bool decimal = false, num min, @required num max, this.divisions}) : super(key, number, question, test, decimal: decimal, signed: false, min: min, max: max);
+
+  final int divisions;
 }
 
 class StringQuestion extends Question {
-  const StringQuestion(int key, int number, String question, ValueTest test) : super(key, number, question, test);
+  const StringQuestion(int key, int number, String question, ValueTest test, {this.hint}) : super(key, number, question, test);
+
+  final String hint;
 }
 
 class BooleanQuestion extends Question {
