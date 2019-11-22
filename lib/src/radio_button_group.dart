@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:grouped_buttons/grouped_buttons.dart' show GroupedButtonsOrientation;
 
 typedef OnRadioButtonSelected<T> = void Function(T value, String label);
 typedef RadioButtonBuilder<T> = Widget Function(BuildContext context, T value, String label, bool disabled, OnRadioButtonSelected<T> onSelected);
@@ -17,7 +16,7 @@ class RadioButtonGroup<T> extends StatelessWidget {
   final OnRadioButtonSelected<T> onSelected;
 
   /// Specifies the orientation to display elements.
-  final GroupedButtonsOrientation orientation;
+  final Axis orientation;
 
   /// Called when needed to build a RadioButtonGroup element.
   final RadioButtonBuilder<T> itemBuilder;
@@ -34,7 +33,7 @@ class RadioButtonGroup<T> extends StatelessWidget {
     @required this.onSelected,
     @required this.itemBuilder,
     this.disabled,
-    this.orientation = GroupedButtonsOrientation.VERTICAL,
+    this.orientation = Axis.vertical,
     this.padding = const EdgeInsets.all(0.0),
     this.margin = const EdgeInsets.all(0.0),
     Key key,
@@ -53,7 +52,7 @@ class RadioButtonGroup<T> extends StatelessWidget {
       padding: padding,
       margin: margin,
       width: mediaQuery.size.width - padding.horizontal,
-      child: orientation == GroupedButtonsOrientation.VERTICAL ? Column(children: content, mainAxisAlignment: MainAxisAlignment.center) : Row(children: content, mainAxisAlignment: MainAxisAlignment.center),
+      child: orientation == Axis.vertical ? Column(children: content, mainAxisAlignment: MainAxisAlignment.center) : Row(children: content, mainAxisAlignment: MainAxisAlignment.center),
       // child: Wrap(
       //   direction: orientation == GroupedButtonsOrientation.VERTICAL ? Axis.vertical : Axis.horizontal,
       //   children: content,

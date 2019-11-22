@@ -2,6 +2,8 @@ import 'dart:io';
 
 import 'package:grizzly_io/grizzly_io.dart';
 
+import 'question.dart';
+
 class Store {
   Store._(this.file, this.data);
   factory Store() => _instance;
@@ -27,18 +29,14 @@ class Store {
     _instance = Store._(file, parseCsv(await file.readAsString()).asMap().map<DateTime, List<dynamic>>((_, e) => MapEntry(DateTime.parse(e[0]), e.skip(1).toList())));
   }
 
-  void start(DateTime dateTime, {int len = LEN}) {
+  void start(DateTime dateTime, {int len = 32}) {
     current = dateTime;
     data[current] = List(len);
-    data[current][EQ] = 0;
+    data[current][EQQuestion.KEY] = 0;
   }
-
-  void add(int toAdd) => data[current][EQ] += toAdd;
 
   dynamic operator [](int key) => data[current][key];
   operator []=(int key, dynamic newValue) => data[current][key] = newValue;
-
-  static const EQ = 0, HOURS_VG = 1, HOURS_VG_V = 2, LEN = 32;
 
   static String encode(dynamic v) {
     if (v is Duration) {

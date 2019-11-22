@@ -44,7 +44,7 @@ class HomePage extends StatelessWidget {
             state(context).debugCount++;
           },
           child: Text(
-            start ? 'Just a survey.' : 'Thank you for participating in our survey.',
+            start ? 'Welcome.' : 'Thank you for participating in our survey.',
             style: TextStyle(color: Colors.orangeAccent, fontWeight: FontWeight.bold, fontSize: 30.0),
             softWrap: true,
           ),

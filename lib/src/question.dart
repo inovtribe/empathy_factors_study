@@ -5,26 +5,19 @@ import 'package:provider/provider.dart';
 
 enum When { Agree, Distraction, Disagree }
 
-
-
-enum InputType {
-  String,
-  Int,
-  Double,
-  Boolean,
-}
-
 String nullTest(dynamic value) => value == null ? 'Must not be null.' : null;
 
 class Response {
-  const Response(this.label);
+  const Response(this.label, this.when, this.value);
 
   final String label;
+  final When when;
+  final int value;
 
-  static const StronglyAgree = Response('Strongly Agree');
-  static const SlightlyAgree = Response('Slightly Agree');
-  static const SlightlyDisagree = Response('Slightly Disagree');
-  static const StronglyDisagree = Response('Strongly Disagree');
+  static const StronglyAgree = Response('Strongly Agree', When.Agree, 2);
+  static const SlightlyAgree = Response('Slightly Agree', When.Agree, 1);
+  static const SlightlyDisagree = Response('Slightly Disagree', When.Disagree, 1);
+  static const StronglyDisagree = Response('Strongly Disagree', When.Disagree, 2);
 
   /// A set of responses for how much a person agrees with something.
   static const Map<Response, String> agreementSet = {
@@ -66,232 +59,198 @@ class QuestionRegistrar<Q extends Question> {
     return registry[index];
   }
 
-  /**
-   * Returns the number of elements in [this].
-   *
-   * Counting all elements may involve iterating through all elements and can
-   * therefore be slow.
-   * Some iterables have a more efficient way to find the number of elements.
-   */
+  /// Returns the number of elements in [this].
+  ///
+  /// Counting all elements may involve iterating through all elements and can
+  /// therefore be slow.
+  /// Some iterables have a more efficient way to find the number of elements.
   int get length => registry.length;
 
-  /**
-   * Returns the [index]th element.
-   *
-   * The [index] must be non-negative and less than [length].
-   * Index zero represents the first element (so `iterable.elementAt(0)` is
-   * equivalent to `iterable.first`).
-   *
-   * May iterate through the elements in iteration order, ignoring the
-   * first [index] elements and then returning the next.
-   * Some iterables may have more a efficient way to find the element.
-   */
+  /// Returns the [index]th element.
+  ///
+  /// The [index] must be non-negative and less than [length].
+  /// Index zero represents the first element (so `iterable.elementAt(0)` is
+  /// equivalent to `iterable.first`).
+  ///
+  /// May iterate through the elements in iteration order, ignoring the
+  /// first [index] elements and then returning the next.
+  /// Some iterables may have more a efficient way to find the element.
   Q elementAt(int index) => registry.elementAt(index);
 
-  /**
-   * Returns the first element.
-   *
-   * Throws a [StateError] if `this` is empty.
-   * Otherwise returns the first element in the iteration order,
-   * equivalent to `this.elementAt(0)`.
-   */
+  /// Returns the first element.
+  ///
+  /// Throws a [StateError] if `this` is empty.
+  /// Otherwise returns the first element in the iteration order,
+  /// equivalent to `this.elementAt(0)`.
   Q get first => registry.first;
 
-  /**
-   * Returns the first element that satisfies the given predicate [test].
-   *
-   * Iterates through elements and returns the first to satisfy [test].
-   *
-   * If no element satisfies [test], the result of invoking the [orElse]
-   * function is returned.
-   * If [orElse] is omitted, it defaults to throwing a [StateError].
-   */
+  /// Returns the first element that satisfies the given predicate [test].
+  ///
+  /// Iterates through elements and returns the first to satisfy [test].
+  ///
+  /// If no element satisfies [test], the result of invoking the [orElse]
+  /// function is returned.
+  /// If [orElse] is omitted, it defaults to throwing a [StateError].
   Q firstWhere(bool Function(Q element) test, {Q Function() orElse}) => registry.firstWhere(test, orElse: orElse);
 
-  /**
-   * Applies the function [f] to each element of this collection in iteration
-   * order.
-   */
+  /// Applies the function [f] to each element of this collection in iteration
+  /// order.
   void forEach(void Function(Q element) f) => registry.forEach(f);
 
-  /**
-   * Returns an [Iterable] that iterates over the objects in the range
-   * [start] inclusive to [end] exclusive.
-   *
-   * The provided range, given by [start] and [end], must be valid at the time
-   * of the call.
-   *
-   * A range from [start] to [end] is valid if `0 <= start <= end <= len`, where
-   * `len` is this list's `length`. The range starts at `start` and has length
-   * `end - start`. An empty range (with `end == start`) is valid.
-   *
-   * The returned [Iterable] behaves like `skip(start).take(end - start)`.
-   * That is, it does *not* throw if this list changes size.
-   *
-   *     List<String> colors = ['red', 'green', 'blue', 'orange', 'pink'];
-   *     Iterable<String> range = colors.getRange(1, 4);
-   *     range.join(', ');  // 'green, blue, orange'
-   *     colors.length = 3;
-   *     range.join(', ');  // 'green, blue'
-   */
+  /// Returns an [Iterable] that iterates over the objects in the range
+  /// [start] inclusive to [end] exclusive.
+  ///
+  /// The provided range, given by [start] and [end], must be valid at the time
+  /// of the call.
+  ///
+  /// A range from [start] to [end] is valid if `0 <= start <= end <= len`, where
+  /// `len` is this list's `length`. The range starts at `start` and has length
+  /// `end - start`. An empty range (with `end == start`) is valid.
+  ///
+  /// The returned [Iterable] behaves like `skip(start).take(end - start)`.
+  /// That is, it does *not* throw if this list changes size.
+  ///
+  ///     List<String> colors = ['red', 'green', 'blue', 'orange', 'pink'];
+  ///     Iterable<String> range = colors.getRange(1, 4);
+  ///     range.join(', ');  // 'green, blue, orange'
+  ///     colors.length = 3;
+  ///     range.join(', ');  // 'green, blue'
   Iterable<Q> getRange(int start, int end) => registry.getRange(start, end);
 
-  /**
-   * Returns `true` if there are no elements in this collection.
-   *
-   * May be computed by checking if `iterator.moveNext()` returns `false`.
-   */
+  /// Returns `true` if there are no elements in this collection.
+  ///
+  /// May be computed by checking if `iterator.moveNext()` returns `false`.
   bool get isEmpty => registry.isEmpty;
 
-  /**
-   * Returns true if there is at least one element in this collection.
-   *
-   * May be computed by checking if `iterator.moveNext()` returns `true`.
-   */
+  /// Returns true if there is at least one element in this collection.
+  ///
+  /// May be computed by checking if `iterator.moveNext()` returns `true`.
   bool get isNotEmpty => registry.isNotEmpty;
 
-  /**
-   * Returns a new `Iterator` that allows iterating the elements of this
-   * `Iterable`.
-   *
-   * Iterable classes may specify the iteration order of their elements
-   * (for example [List] always iterate in index order),
-   * or they may leave it unspecified (for example a hash-based [Set]
-   * may iterate in any order).
-   *
-   * Each time `iterator` is read, it returns a new iterator,
-   * which can be used to iterate through all the elements again.
-   * The iterators of the same iterable can be stepped through independently,
-   * but should return the same elements in the same order,
-   * as long as the underlying collection isn't changed.
-   *
-   * Modifying the collection may cause new iterators to produce
-   * different elements, and may change the order of existing elements.
-   * A [List] specifies its iteration order precisely,
-   * so modifying the list changes the iteration order predictably.
-   * A hash-based [Set] may change its iteration order completely
-   * when adding a new element to the set.
-   *
-   * Modifying the underlying collection after creating the new iterator
-   * may cause an error the next time [Iterator.moveNext] is called
-   * on that iterator.
-   * Any *modifiable* iterable class should specify which operations will
-   * break iteration.
-   */
+  /// Returns a new `Iterator` that allows iterating the elements of this
+  /// `Iterable`.
+  ///
+  /// Iterable classes may specify the iteration order of their elements
+  /// (for example [List] always iterate in index order),
+  /// or they may leave it unspecified (for example a hash-based [Set]
+  /// may iterate in any order).
+  ///
+  /// Each time `iterator` is read, it returns a new iterator,
+  /// which can be used to iterate through all the elements again.
+  /// The iterators of the same iterable can be stepped through independently,
+  /// but should return the same elements in the same order,
+  /// as long as the underlying collection isn't changed.
+  ///
+  /// Modifying the collection may cause new iterators to produce
+  /// different elements, and may change the order of existing elements.
+  /// A [List] specifies its iteration order precisely,
+  /// so modifying the list changes the iteration order predictably.
+  /// A hash-based [Set] may change its iteration order completely
+  /// when adding a new element to the set.
+  ///
+  /// Modifying the underlying collection after creating the new iterator
+  /// may cause an error the next time [Iterator.moveNext] is called
+  /// on that iterator.
+  /// Any *modifiable* iterable class should specify which operations will
+  /// break iteration.
   Iterator<Q> get iterator => registry.iterator;
 
-  /**
-   * Returns the last element.
-   *
-   * Throws a [StateError] if `this` is empty.
-   * Otherwise may iterate through the elements and returns the last one
-   * seen.
-   * Some iterables may have more efficient ways to find the last element
-   * (for example a list can directly access the last element,
-   * without iterating through the previous ones).
-   */
+  /// Returns the last element.
+  ///
+  /// Throws a [StateError] if `this` is empty.
+  /// Otherwise may iterate through the elements and returns the last one
+  /// seen.
+  /// Some iterables may have more efficient ways to find the last element
+  /// (for example a list can directly access the last element,
+  /// without iterating through the previous ones).
   Q get last => registry.last;
 
-  /**
-   * Returns a new lazy [Iterable] with elements that are created by
-   * calling `f` on each element of this `Iterable` in iteration order.
-   *
-   * This method returns a view of the mapped elements. As long as the
-   * returned [Iterable] is not iterated over, the supplied function [f] will
-   * not be invoked. The transformed elements will not be cached. Iterating
-   * multiple times over the returned [Iterable] will invoke the supplied
-   * function [f] multiple times on the same element.
-   *
-   * Methods on the returned iterable are allowed to omit calling `f`
-   * on any element where the result isn't needed.
-   * For example, [elementAt] may call `f` only once.
-   */
+  /// Returns a new lazy [Iterable] with elements that are created by
+  /// calling `f` on each element of this `Iterable` in iteration order.
+  ///
+  /// This method returns a view of the mapped elements. As long as the
+  /// returned [Iterable] is not iterated over, the supplied function [f] will
+  /// not be invoked. The transformed elements will not be cached. Iterating
+  /// multiple times over the returned [Iterable] will invoke the supplied
+  /// function [f] multiple times on the same element.
+  ///
+  /// Methods on the returned iterable are allowed to omit calling `f`
+  /// on any element where the result isn't needed.
+  /// For example, [elementAt] may call `f` only once.
   Iterable<T> map<T>(T Function(Q e) f) => registry.map<T>(f);
 
-  /**
-   * Returns an [Iterable] that provides all but the first [count] elements.
-   *
-   * When the returned iterable is iterated, it starts iterating over `this`,
-   * first skipping past the initial [count] elements.
-   * If `this` has fewer than `count` elements, then the resulting Iterable is
-   * empty.
-   * After that, the remaining elements are iterated in the same order as
-   * in this iterable.
-   *
-   * Some iterables may be able to find later elements without first iterating
-   * through earlier elements, for example when iterating a [List].
-   * Such iterables are allowed to ignore the initial skipped elements.
-   *
-   * The [count] must not be negative.
-   */
+  /// Returns an [Iterable] that provides all but the first [count] elements.
+  ///
+  /// When the returned iterable is iterated, it starts iterating over `this`,
+  /// first skipping past the initial [count] elements.
+  /// If `this` has fewer than `count` elements, then the resulting Iterable is
+  /// empty.
+  /// After that, the remaining elements are iterated in the same order as
+  /// in this iterable.
+  ///
+  /// Some iterables may be able to find later elements without first iterating
+  /// through earlier elements, for example when iterating a [List].
+  /// Such iterables are allowed to ignore the initial skipped elements.
+  ///
+  /// The [count] must not be negative.
   Iterable<Q> skip(int count) => registry.skip(count);
 
-  /**
-   * Returns an `Iterable` that skips leading elements while [test] is satisfied.
-   *
-   * The filtering happens lazily. Every new [Iterator] of the returned
-   * iterable iterates over all elements of `this`.
-   *
-   * The returned iterable provides elements by iterating this iterable,
-   * but skipping over all initial elements where `test(element)` returns
-   * true. If all elements satisfy `test` the resulting iterable is empty,
-   * otherwise it iterates the remaining elements in their original order,
-   * starting with the first element for which `test(element)` returns `false`.
-   */
+  /// Returns an `Iterable` that skips leading elements while [test] is satisfied.
+  ///
+  /// The filtering happens lazily. Every new [Iterator] of the returned
+  /// iterable iterates over all elements of `this`.
+  ///
+  /// The returned iterable provides elements by iterating this iterable,
+  /// but skipping over all initial elements where `test(element)` returns
+  /// true. If all elements satisfy `test` the resulting iterable is empty,
+  /// otherwise it iterates the remaining elements in their original order,
+  /// starting with the first element for which `test(element)` returns `false`.
   Iterable<Q> skipWhile(bool Function(Q value) test) => registry.skipWhile(test);
 
-  /**
-   * Returns a lazy iterable of the [count] first elements of this iterable.
-   *
-   * The returned `Iterable` may contain fewer than `count` elements, if `this`
-   * contains fewer than `count` elements.
-   *
-   * The elements can be computed by stepping through [iterator] until [count]
-   * elements have been seen.
-   *
-   * The `count` must not be negative.
-   */
+  /// Returns a lazy iterable of the [count] first elements of this iterable.
+  ///
+  /// The returned `Iterable` may contain fewer than `count` elements, if `this`
+  /// contains fewer than `count` elements.
+  ///
+  /// The elements can be computed by stepping through [iterator] until [count]
+  /// elements have been seen.
+  ///
+  /// The `count` must not be negative.
   Iterable<Q> take(int count) => registry.take(count);
 
-  /**
-   * Returns a lazy iterable of the leading elements satisfying [test].
-   *
-   * The filtering happens lazily. Every new iterator of the returned
-   * iterable starts iterating over the elements of `this`.
-   *
-   * The elements can be computed by stepping through [iterator] until an
-   * element is found where `test(element)` is false. At that point,
-   * the returned iterable stops (its `moveNext()` returns false).
-   */
+  /// Returns a lazy iterable of the leading elements satisfying [test].
+  ///
+  /// The filtering happens lazily. Every new iterator of the returned
+  /// iterable starts iterating over the elements of `this`.
+  ///
+  /// The elements can be computed by stepping through [iterator] until an
+  /// element is found where `test(element)` is false. At that point,
+  /// the returned iterable stops (its `moveNext()` returns false).
   Iterable<Q> takeWhile(bool Function(Q value) test) => registry.takeWhile(test);
 
-  /**
-   * Returns a new lazy [Iterable] with all elements that satisfy the
-   * predicate [test].
-   *
-   * The matching elements have the same order in the returned iterable
-   * as they have in [iterator].
-   *
-   * This method returns a view of the mapped elements.
-   * As long as the returned [Iterable] is not iterated over,
-   * the supplied function [test] will not be invoked.
-   * Iterating will not cache results, and thus iterating multiple times over
-   * the returned [Iterable] may invoke the supplied
-   * function [test] multiple times on the same element.
-   */
+  /// Returns a new lazy [Iterable] with all elements that satisfy the
+  /// predicate [test].
+  ///
+  /// The matching elements have the same order in the returned iterable
+  /// as they have in [iterator].
+  ///
+  /// This method returns a view of the mapped elements.
+  /// As long as the returned [Iterable] is not iterated over,
+  /// the supplied function [test] will not be invoked.
+  /// Iterating will not cache results, and thus iterating multiple times over
+  /// the returned [Iterable] may invoke the supplied
+  /// function [test] multiple times on the same element.
   Iterable<Q> where(bool Function(Q element) test) => registry.where(test);
 
-  /**
-   * Returns a new lazy [Iterable] with all elements that have type [T].
-   *
-   * The matching elements have the same order in the returned iterable
-   * as they have in [iterator].
-   *
-   * This method returns a view of the mapped elements.
-   * Iterating will not cache results, and thus iterating multiple times over
-   * the returned [Iterable] may yield different results,
-   * if the underlying elements change between iterations.
-   */
+  /// Returns a new lazy [Iterable] with all elements that have type [T].
+  ///
+  /// The matching elements have the same order in the returned iterable
+  /// as they have in [iterator].
+  ///
+  /// This method returns a view of the mapped elements.
+  /// Iterating will not cache results, and thus iterating multiple times over
+  /// the returned [Iterable] may yield different results,
+  /// if the underlying elements change between iterations.
   Iterable<T> whereType<T>() => registry.whereType<T>();
 }
 
@@ -364,12 +323,13 @@ const empathyQuotientDistractionRegistrar = QuestionRegistrar<EQQuestion>.of([
 QuestionRegistrar<EQQuestion> get distractedEmpathyQuotientRegistrar => QuestionRegistrar.of([...empathyQuotientRegistrar.registry, ...empathyQuotientDistractionRegistrar.registry]..sort((a, b) => a.number.compareTo(b.number)));
 
 
-const otherQuestionRegistrar = QuestionRegistrar<InputQuestion>.of([
-  InputQuestion(1, 'On average, how much time each day do you play video games?', InputType.Double, Store.HOURS_VG, nullTest),
-  InputQuestion(2, 'On average, how much time each day do you play violent video games?', InputType.Double, Store.HOURS_VG_V, nullTest),
+const correlationRegistrar = QuestionRegistrar<Question>.of([
+  NumQuestion(1, 1, 'On average, how much time each day do you play video games?', nullTest, decimal: true),
+  NumQuestion(2, 2, 'On average, how much time each day do you play violent video games?', nullTest, decimal: true),
+  NumQuestion(3, 3, 'If a person you\'ve never met before bumped into you hard in a supermarket, how likely would you be to shout, shove or swear at them.', nullTest, decimal: true),
 ]);
 
-QuestionRegistrar<Question> get mixedRegistrar => QuestionRegistrar.of([...empathyQuotientRegistrar.registry..shuffle(), ...otherQuestionRegistrar.registry]);
+QuestionRegistrar<Question> get mixedRegistrar => QuestionRegistrar.of([...empathyQuotientRegistrar.registry..shuffle(), ...correlationRegistrar.registry]);
 
 class QuestionnaireState<Q extends Question> {
   /// Instantiates a [QuestionnaireState]
@@ -431,8 +391,9 @@ class QuestionnaireState<Q extends Question> {
 typedef String ValueTest(dynamic value);
 
 abstract class Question {
-  const Question(this.number, this.question, this.test);
+  const Question(this.key, this.number, this.question, this.test);
 
+  final int key;
   final int number;
   final String question;
   final ValueTest test;
@@ -442,17 +403,32 @@ abstract class Question {
 }
 
 class EQQuestion extends Question {
-  const EQQuestion(int number, String question, this.when) : super(number, question, _test);
+  const EQQuestion(int number, String question, this.when) : super(KEY, number, question, _test);
 
   final When when;
 
   static String _test(dynamic value) => value == null ? 'Please choose an option.' : null;
+
+  void add(Response response) {
+    if (when == response.when) {
+      Store()[key] += response.value;
+    }
+  }
+
+  static const int KEY = 0;
 }
 
-class InputQuestion extends Question {
-  const InputQuestion(int number, String question, this.type, this.key, ValueTest test) : super(number, question, test);
+class NumQuestion extends Question {
+  const NumQuestion(int key, int number, String question, ValueTest test, {this.decimal = false, this.signed = false}) : super(key, number, question, test);
 
-  final InputType type;
+  final bool decimal;
+  final bool signed;
+}
 
-  final int key;
+class StringQuestion extends Question {
+  const StringQuestion(int key, int number, String question, ValueTest test) : super(key, number, question, test);
+}
+
+class BooleanQuestion extends Question {
+  const BooleanQuestion(int key, int number, String question, ValueTest test) : super(key, number, question, test);
 }

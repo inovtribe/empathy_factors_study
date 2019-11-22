@@ -8,10 +8,9 @@ import 'package:factors_empathy_survey/src/route_transitions.dart';
 import 'package:factors_empathy_survey/src/store.dart';
 import 'package:factors_empathy_survey/src/util.dart';
 import 'package:flutter/material.dart';
-import 'package:grouped_buttons/grouped_buttons.dart' show GroupedButtonsOrientation;
 
 class QuestionPage extends StatefulWidget {
-  QuestionPage({Key key}) : super(key: key);
+  const QuestionPage({Key key}) : super(key: key);
 
   @override
   _QuestionPageState createState() => _QuestionPageState();
@@ -19,7 +18,7 @@ class QuestionPage extends StatefulWidget {
   static void navigate(BuildContext context) {
     Navigator.of(context).push(
       PlainRoute(
-        pageBuilder: (context, animation, secondaryAnimation) => QuestionPage(),
+        pageBuilder: (context, animation, secondaryAnimation) => const QuestionPage(),
       ),
     );
   }
@@ -40,15 +39,15 @@ class _QuestionPageState extends State<QuestionPage> with SingleTickerProviderSt
   @override
   double get animationEnd => (state.currentIndex + 1) / state.registrar.length;
 
-  String whyFckedUp;
-  bool get fckedUp => whyFckedUp != null;
+  String whyNotValid;
+  bool get notValid => whyNotValid != null;
 
   dynamic _tmp;
   dynamic get tmp => _tmp;
   set tmp(dynamic newTmp) => _tmp = newTmp;
 
   set tmpC(dynamic newTmp) {
-    whyFckedUp = state.current.test(newTmp);
+    whyNotValid = state.current.test(newTmp);
     tmp = newTmp;
   }
 
@@ -63,66 +62,58 @@ class _QuestionPageState extends State<QuestionPage> with SingleTickerProviderSt
     return TimeOfDay(hour: int.parse(splitted[0]), minute: int.parse(splitted[1]));
   }
 
-  Widget formInput(InputQuestion question) {
+  Widget formInput(Question question) {
     final store = Store();
-    switch (question.type) {
-      case InputType.String:
-        //TODO(mpfaff): Possibly remove store logic
-        tmp ??= store[question.key] ?? '';
-        final controller = TextEditingController(text: tmp);
-        return TextField(
-          autocorrect: true,
-          autofocus: true,
-          textInputAction: TextInputAction.done,
-          onChanged: (_) => tmp = controller.value.text,
-          controller: controller,
-        );
-      case InputType.Int:
-        //TODO(mpfaff): Possibly remove store logic
-        tmp ??= store[question.key] ?? '0';
-        final controller = TextEditingController(text: tmp);
-        return TextField(
-          autocorrect: true,
-          autofocus: true,
-          textInputAction: TextInputAction.done,
-          keyboardType: TextInputType.number,
-          onChanged: (_) => tmp = controller.value.text,
-          controller: controller,
-        );
-      case InputType.Double:
-        //TODO(mpfaff): Possibly remove store logic
-        if (!(tmp is String)) {
-          tmp = store[question.key] ?? '0';
-        }
-        final controller = TextEditingController(text: tmp);
-        return TextField(
-          autocorrect: true,
-          autofocus: true,
-          textInputAction: TextInputAction.done,
-          keyboardType: const TextInputType.numberWithOptions(decimal: true),
-          onChanged: (_) => tmp = controller.value.text,
-          controller: controller,
-        );
-      case InputType.Boolean:
-        tmp ??= Ternary.Neutral;
-        return Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            MaterialButton(
-              color: tmp == Ternary.True ? Colors.orangeAccent : Colors.white,
-              elevation: 4,
-              child: Text('True', style: TextStyle(fontSize: 14)),
-              onPressed: () => setState(() => tmp = Ternary.True),
-            ),
-            MaterialButton(
-              color: tmp == Ternary.False ? Colors.orangeAccent : Colors.white,
-              elevation: 4,
-              child: Text('False', style: TextStyle(fontSize: 14)),
-              onPressed: () => setState(() => tmp = Ternary.False),
-            ),
-          ],
-        );
+    if (question is NumQuestion) {
+      if (!(tmp is String)) {
+        // TODO(mpfaff): Possibly remove store logic
+        tmp = store[question.key] ?? '0';
+      }
+      final controller = TextEditingController(text: tmp);
+      return TextField(
+        autocorrect: true,
+        autofocus: true,
+        textInputAction: TextInputAction.done,
+        keyboardType: TextInputType.numberWithOptions(decimal: question.decimal, signed: question.signed),
+        onChanged: (_) => tmp = controller.value.text,
+        controller: controller,
+      );
+    } else if (question is StringQuestion) {
+      if (!(tmp is String)) {
+        // TODO(mpfaff): Possibly remove store logic
+        tmp = store[question.key] ?? '';
+      }
+      final controller = TextEditingController(text: tmp);
+      return TextField(
+        autocorrect: true,
+        autofocus: true,
+        textInputAction: TextInputAction.done,
+        onChanged: (_) => tmp = controller.value.text,
+        controller: controller,
+      );
+    } else if (question is BooleanQuestion) {
+      if (!(tmp is Ternary)) {
+        // TODO(mpfaff): Possibly remove store logic
+        tmp = Ternary.parse(store[question.key]) ?? Ternary.Neutral;
+      }
+      return Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          MaterialButton(
+            color: tmp == Ternary.True ? Colors.orangeAccent : Colors.white,
+            elevation: 4,
+            child: Text('True', style: TextStyle(fontSize: 14)),
+            onPressed: () => setState(() => tmp = Ternary.True),
+          ),
+          MaterialButton(
+            color: tmp == Ternary.False ? Colors.orangeAccent : Colors.white,
+            elevation: 4,
+            child: Text('False', style: TextStyle(fontSize: 14)),
+            onPressed: () => setState(() => tmp = Ternary.False),
+          ),
+        ],
+      );
     }
 
     return const Text('You fcked up.');
@@ -139,20 +130,13 @@ class _QuestionPageState extends State<QuestionPage> with SingleTickerProviderSt
           current is EQQuestion && current.when == When.Distraction && state.debug ? '|-- ${current.question} --|' : current.question,
           style: TextStyle(color: Colors.orangeAccent, fontWeight: FontWeight.bold, fontSize: 30.0),
         ),
-        if (current is EQQuestion)
-          RadioButtonGroup<Response>(
-            options: Response.agreementSet,
-            orientation: GroupedButtonsOrientation.HORIZONTAL,
-            onSelected: (value, label) => setState(() => tmp = value),
-            itemBuilder: (context, value, label, disabled, onSelected) => RadioBoxButton(label: label, value: value, isSelected: value == tmp, length: 4, onSelected: onSelected),
-          ),
-        if (current is InputQuestion) formInput(current),
+        formInput(current),
         Visibility(
           child: Text(
-            whyFckedUp ?? '',
+            whyNotValid ?? '',
             style: TextStyle(color: Colors.red, fontStyle: FontStyle.italic, fontSize: 18.0),
           ),
-          visible: fckedUp,
+          visible: notValid,
         ),
       ],
       bottomBarContent: Column(
@@ -161,25 +145,12 @@ class _QuestionPageState extends State<QuestionPage> with SingleTickerProviderSt
           GestureDetector(
             onTap: () {
               final store = Store();
-              whyFckedUp = current.test(tmp);
+              whyNotValid = current.test(tmp);
 
-              if (!fckedUp) {
+              if (!notValid) {
                 if (current is EQQuestion) {
-                  switch (current.when) {
-                    case When.Agree:
-                      if (tmp == Response.StronglyAgree)
-                        store.add(2);
-                      else if (tmp == Response.SlightlyAgree) store.add(1);
-                      break;
-                    case When.Distraction:
-                      break;
-                    case When.Disagree:
-                      if (tmp == Response.StronglyDisagree)
-                        store.add(2);
-                      else if (tmp == Response.SlightlyDisagree) store.add(1);
-                      break;
-                  }
-                } else if (current is InputQuestion) {
+                  current.add(tmp);
+                } else {
                   store[current.key] = tmp;
                 }
 
@@ -237,12 +208,12 @@ class RadioBoxButton<T> extends StatelessWidget {
   final OnRadioButtonSelected<T> onSelected;
 
   const RadioBoxButton({
-    Key key,
     @required this.value,
     @required this.label,
     @required this.isSelected,
     @required this.length,
     @required this.onSelected,
+    Key key,
   })  : assert(label != null, 'label must not be null'),
         assert(value != null, 'value must not be null'),
         super(key: key);
