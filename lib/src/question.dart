@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:provider/provider.dart';
 
-enum When { Agree, Distraction, Disagree }
+import 'util.dart';
 
 String nullTest(dynamic value) => value == null ? 'Must not be null.' : null;
 
@@ -11,13 +11,13 @@ class Response {
   const Response(this.label, this.when, this.value);
 
   final String label;
-  final When when;
+  final Ternary when;
   final int value;
 
-  static const StronglyAgree = Response('Strongly Agree', When.Agree, 2);
-  static const SlightlyAgree = Response('Slightly Agree', When.Agree, 1);
-  static const SlightlyDisagree = Response('Slightly Disagree', When.Disagree, 1);
-  static const StronglyDisagree = Response('Strongly Disagree', When.Disagree, 2);
+  static const StronglyAgree = Response('Strongly Agree', Ternary.Agree, 2);
+  static const SlightlyAgree = Response('Slightly Agree', Ternary.Agree, 1);
+  static const SlightlyDisagree = Response('Slightly Disagree', Ternary.Disagree, 1);
+  static const StronglyDisagree = Response('Strongly Disagree', Ternary.Disagree, 2);
 
   /// A set of responses for how much a person agrees with something.
   static const Map<Response, String> agreementSet = {
@@ -255,69 +255,69 @@ class QuestionRegistrar<Q extends Question> {
 }
 
 const empathyQuotientRegistrar = QuestionRegistrar<EQQuestion>.of([
-  EQQuestion(1, 'I can easily tell if someone else wants to enter a conversation.', When.Agree),
-  EQQuestion(4, 'I find it difficult to explain to others things that I understand easily, when they don’t understand it the first time.', When.Disagree),
-  EQQuestion(6, 'I really enjoy caring for other people.', When.Agree),
-  EQQuestion(8, 'I find it hard to know what to do in a social situation.', When.Disagree),
-  EQQuestion(10, 'People often tell me that I went too far in driving my point home in a discussion.', When.Disagree),
-  EQQuestion(11, 'It doesn’t bother me too much if I am late meeting a friend.', When.Disagree),
-  EQQuestion(12, 'Friendships and relationships are just too difficult, so I tend not to bother with them.', When.Disagree),
-  EQQuestion(14, 'I often find it difficult to judge if something is rude or polite.', When.Disagree),
-  EQQuestion(15, 'In a conversation, I tend to focus on my own thoughts rather than on what my listener might be thinking.', When.Disagree),
-  EQQuestion(18, 'When I was a child, I enjoyed cutting up worms to see what would happen.', When.Disagree),
-  EQQuestion(19, 'I can pick up quickly if someone says one thing but means another.', When.Agree),
-  EQQuestion(21, 'It is hard for me to see why some things upset people so much.', When.Disagree),
-  EQQuestion(22, 'I find it easy to put myself in somebody else’s shoes.', When.Agree),
-  EQQuestion(25, 'I am good at predicting how someone will feel.', When.Agree),
-  EQQuestion(26, 'I am quick to spot when someone in a group is feeling awkward or uncomfortable.', When.Agree),
-  EQQuestion(27, 'If I say something that someone else is offended by, I think that that’s their problem, not mine.', When.Disagree),
-  EQQuestion(28, 'If anyone asked me if I liked their haircut, I would reply truthfully, even if I didn’t like it.', When.Disagree),
-  EQQuestion(29, 'I can’t always see why someone should have felt offended by a remark.', When.Disagree),
-  EQQuestion(32, 'Seeing people cry doesn’t really upset me.', When.Disagree),
-  EQQuestion(34, 'I am very blunt, which some people take to be rudeness, even though this is unintentional.', When.Disagree),
-  EQQuestion(35, 'I don’t find social situations confusing.', When.Agree),
-  EQQuestion(36, 'Other people tell me I am good at understanding how they are feeling and what they are thinking.', When.Agree),
-  EQQuestion(37, 'When I talk to people, I tend to talk about their experiences rather than my own.', When.Agree),
-  EQQuestion(38, 'It upsets me to see an animal in pain.', When.Agree),
-  EQQuestion(39, 'I am able to make decisions without being influenced by people’s feelings.', When.Disagree),
-  EQQuestion(41, 'I can easily tell if someone else is interested or bored with what I am saying.', When.Agree),
-  EQQuestion(42, 'I get upset if I see people suffering on news programs.', When.Agree),
-  EQQuestion(43, 'Friends usually talk to me about their problems as they say that I am very understanding.', When.Agree),
-  EQQuestion(44, 'I can sense if I am intruding, even if the other person doesn’t tell me.', When.Agree),
-  EQQuestion(46, 'People sometimes tell me that I have gone too far with teasing.', When.Disagree),
-  EQQuestion(48, 'Other people often say that I am insensitive, though I don’t always see why.', When.Disagree),
-  EQQuestion(49, 'If I see a stranger in a group, I think that it is up to them to make an effort to join in.', When.Disagree),
-  EQQuestion(50, 'I usually stay emotionally detached when watching a film.', When.Disagree),
-  EQQuestion(52, 'I can tune into how someone else feels rapidly and intuitively.', When.Agree),
-  EQQuestion(54, 'I can easily work out what another person might want to talk about.', When.Agree),
-  EQQuestion(55, 'I can tell if someone is masking their true emotion.', When.Agree),
-  EQQuestion(57, 'I don’t consciously work out the rules of social situations.', When.Agree),
-  EQQuestion(58, 'I am good at predicting what someone will do.', When.Agree),
-  EQQuestion(59, 'I tend to get emotionally involved with a friend’s problems.', When.Agree),
-  EQQuestion(60, 'I can usually appreciate the other person’s viewpoint, even if I don’t agree with it.', When.Agree),
+  EQQuestion(1, 'I can easily tell if someone else wants to enter a conversation.', Ternary.Agree),
+  EQQuestion(4, 'I find it difficult to explain to others things that I understand easily, when they don’t understand it the first time.', Ternary.Disagree),
+  EQQuestion(6, 'I really enjoy caring for other people.', Ternary.Agree),
+  EQQuestion(8, 'I find it hard to know what to do in a social situation.', Ternary.Disagree),
+  EQQuestion(10, 'People often tell me that I went too far in driving my point home in a discussion.', Ternary.Disagree),
+  EQQuestion(11, 'It doesn’t bother me too much if I am late meeting a friend.', Ternary.Disagree),
+  EQQuestion(12, 'Friendships and relationships are just too difficult, so I tend not to bother with them.', Ternary.Disagree),
+  EQQuestion(14, 'I often find it difficult to judge if something is rude or polite.', Ternary.Disagree),
+  EQQuestion(15, 'In a conversation, I tend to focus on my own thoughts rather than on what my listener might be thinking.', Ternary.Disagree),
+  EQQuestion(18, 'When I was a child, I enjoyed cutting up worms to see what would happen.', Ternary.Disagree),
+  EQQuestion(19, 'I can pick up quickly if someone says one thing but means another.', Ternary.Agree),
+  EQQuestion(21, 'It is hard for me to see why some things upset people so much.', Ternary.Disagree),
+  EQQuestion(22, 'I find it easy to put myself in somebody else’s shoes.', Ternary.Agree),
+  EQQuestion(25, 'I am good at predicting how someone will feel.', Ternary.Agree),
+  EQQuestion(26, 'I am quick to spot when someone in a group is feeling awkward or uncomfortable.', Ternary.Agree),
+  EQQuestion(27, 'If I say something that someone else is offended by, I think that that’s their problem, not mine.', Ternary.Disagree),
+  EQQuestion(28, 'If anyone asked me if I liked their haircut, I would reply truthfully, even if I didn’t like it.', Ternary.Disagree),
+  EQQuestion(29, 'I can’t always see why someone should have felt offended by a remark.', Ternary.Disagree),
+  EQQuestion(32, 'Seeing people cry doesn’t really upset me.', Ternary.Disagree),
+  EQQuestion(34, 'I am very blunt, which some people take to be rudeness, even though this is unintentional.', Ternary.Disagree),
+  EQQuestion(35, 'I don’t find social situations confusing.', Ternary.Agree),
+  EQQuestion(36, 'Other people tell me I am good at understanding how they are feeling and what they are thinking.', Ternary.Agree),
+  EQQuestion(37, 'When I talk to people, I tend to talk about their experiences rather than my own.', Ternary.Agree),
+  EQQuestion(38, 'It upsets me to see an animal in pain.', Ternary.Agree),
+  EQQuestion(39, 'I am able to make decisions without being influenced by people’s feelings.', Ternary.Disagree),
+  EQQuestion(41, 'I can easily tell if someone else is interested or bored with what I am saying.', Ternary.Agree),
+  EQQuestion(42, 'I get upset if I see people suffering on news programs.', Ternary.Agree),
+  EQQuestion(43, 'Friends usually talk to me about their problems as they say that I am very understanding.', Ternary.Agree),
+  EQQuestion(44, 'I can sense if I am intruding, even if the other person doesn’t tell me.', Ternary.Agree),
+  EQQuestion(46, 'People sometimes tell me that I have gone too far with teasing.', Ternary.Disagree),
+  EQQuestion(48, 'Other people often say that I am insensitive, though I don’t always see why.', Ternary.Disagree),
+  EQQuestion(49, 'If I see a stranger in a group, I think that it is up to them to make an effort to join in.', Ternary.Disagree),
+  EQQuestion(50, 'I usually stay emotionally detached when watching a film.', Ternary.Disagree),
+  EQQuestion(52, 'I can tune into how someone else feels rapidly and intuitively.', Ternary.Agree),
+  EQQuestion(54, 'I can easily work out what another person might want to talk about.', Ternary.Agree),
+  EQQuestion(55, 'I can tell if someone is masking their true emotion.', Ternary.Agree),
+  EQQuestion(57, 'I don’t consciously work out the rules of social situations.', Ternary.Agree),
+  EQQuestion(58, 'I am good at predicting what someone will do.', Ternary.Agree),
+  EQQuestion(59, 'I tend to get emotionally involved with a friend’s problems.', Ternary.Agree),
+  EQQuestion(60, 'I can usually appreciate the other person’s viewpoint, even if I don’t agree with it.', Ternary.Agree),
 ]);
 
 const empathyQuotientDistractionRegistrar = QuestionRegistrar<EQQuestion>.of([
-  EQQuestion(2, 'I prefer animals to humans.', When.Distraction),
-  EQQuestion(3, 'I try to keep up with the current trends and fashions.', When.Distraction),
-  EQQuestion(5, 'I dream most nights.', When.Distraction),
-  EQQuestion(7, 'I try to solve my own problems rather than discussing them with others.', When.Distraction),
-  EQQuestion(9, 'I am at my best first thing in the morning.', When.Distraction),
-  EQQuestion(13, 'I would never break a law, no matter how minor.', When.Distraction),
-  EQQuestion(16, 'I prefer practical jokes to verbal humor.', When.Distraction),
-  EQQuestion(17, 'I live life for today rather than the future.', When.Distraction),
-  EQQuestion(20, 'I tend to have very strong opinions about morality.', When.Distraction),
-  EQQuestion(23, 'I think that good manners are the most important thing a parent can teach their child.', When.Distraction),
-  EQQuestion(24, 'I like to do things on the spur of the moment.', When.Distraction),
-  EQQuestion(30, 'People often tell me that I am very unpredictable.', When.Distraction),
-  EQQuestion(31, 'I enjoy being the center of attention at any social gathering.', When.Distraction),
-  EQQuestion(33, 'I enjoy having discussions about politics.', When.Distraction),
-  EQQuestion(40, 'I can’t relax until I have done everything I had planned to do that day.', When.Distraction),
-  EQQuestion(45, 'I often start new hobbies, but quickly become bored with them and move on to something else.', When.Distraction),
-  EQQuestion(47, 'I would be too nervous to go on a big rollercoaster.', When.Distraction),
-  EQQuestion(51, 'I like to be very organized in day-to-day life and often makes lists of the chores I have to do.', When.Distraction),
-  EQQuestion(53, 'I don’t like to take risks.', When.Distraction),
-  EQQuestion(56, 'Before making a decision, I always weigh up the pros and cons.', When.Distraction),
+  EQQuestion(2, 'I prefer animals to humans.', Ternary.Neutral),
+  EQQuestion(3, 'I try to keep up with the current trends and fashions.', Ternary.Neutral),
+  EQQuestion(5, 'I dream most nights.', Ternary.Neutral),
+  EQQuestion(7, 'I try to solve my own problems rather than discussing them with others.', Ternary.Neutral),
+  EQQuestion(9, 'I am at my best first thing in the morning.', Ternary.Neutral),
+  EQQuestion(13, 'I would never break a law, no matter how minor.', Ternary.Neutral),
+  EQQuestion(16, 'I prefer practical jokes to verbal humor.', Ternary.Neutral),
+  EQQuestion(17, 'I live life for today rather than the future.', Ternary.Neutral),
+  EQQuestion(20, 'I tend to have very strong opinions about morality.', Ternary.Neutral),
+  EQQuestion(23, 'I think that good manners are the most important thing a parent can teach their child.', Ternary.Neutral),
+  EQQuestion(24, 'I like to do things on the spur of the moment.', Ternary.Neutral),
+  EQQuestion(30, 'People often tell me that I am very unpredictable.', Ternary.Neutral),
+  EQQuestion(31, 'I enjoy being the center of attention at any social gathering.', Ternary.Neutral),
+  EQQuestion(33, 'I enjoy having discussions about politics.', Ternary.Neutral),
+  EQQuestion(40, 'I can’t relax until I have done everything I had planned to do that day.', Ternary.Neutral),
+  EQQuestion(45, 'I often start new hobbies, but quickly become bored with them and move on to something else.', Ternary.Neutral),
+  EQQuestion(47, 'I would be too nervous to go on a big rollercoaster.', Ternary.Neutral),
+  EQQuestion(51, 'I like to be very organized in day-to-day life and often makes lists of the chores I have to do.', Ternary.Neutral),
+  EQQuestion(53, 'I don’t like to take risks.', Ternary.Neutral),
+  EQQuestion(56, 'Before making a decision, I always weigh up the pros and cons.', Ternary.Neutral),
 ]);
 
 QuestionRegistrar<EQQuestion> get distractedEmpathyQuotientRegistrar => QuestionRegistrar.of([...empathyQuotientRegistrar.registry, ...empathyQuotientDistractionRegistrar.registry]..sort((a, b) => a.number.compareTo(b.number)));
@@ -329,7 +329,7 @@ const correlationRegistrar = QuestionRegistrar<Question>.of([
   NumQuestion(3, 3, 'If a person you\'ve never met before bumped into you hard in a supermarket, how likely would you be to shout, shove or swear at them.', nullTest, decimal: true),
 ]);
 
-QuestionRegistrar<Question> get mixedRegistrar => QuestionRegistrar.of([...empathyQuotientRegistrar.registry..shuffle(), ...correlationRegistrar.registry]);
+QuestionRegistrar<Question> get mixedRegistrar => QuestionRegistrar.of([...empathyQuotientRegistrar.registry.toList()..shuffle(), ...correlationRegistrar.registry]);
 
 class QuestionnaireState<Q extends Question> {
   /// Instantiates a [QuestionnaireState]
@@ -388,8 +388,11 @@ class QuestionnaireState<Q extends Question> {
   }
 }
 
+/// Given `value`, return null if valid or a non-null `String` denoting a reason why if invalid.
 typedef String ValueTest(dynamic value);
 
+
+/// A question with a key for storage, number for sorting, string for the actual question and [ValueTest] for testing a user's answer.
 abstract class Question {
   const Question(this.key, this.number, this.question, this.test);
 
@@ -405,7 +408,7 @@ abstract class Question {
 class EQQuestion extends Question {
   const EQQuestion(int number, String question, this.when) : super(KEY, number, question, _test);
 
-  final When when;
+  final Ternary when;
 
   static String _test(dynamic value) => value == null ? 'Please choose an option.' : null;
 

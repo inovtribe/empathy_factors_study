@@ -39,12 +39,16 @@ class Ternary {
   @override
   String toString() => label.toLowerCase();
 
-  /// A ternary value denoting `True`,
-  static const True = Ternary._(1, true, 'True', ['true', 'positive', '+', '1']);
+  /// A ternary value denoting `true`.
+  static const True = Ternary._(1, true, 'True', ['true', 'positive', '+', '1', 'agree']);
+  /// A ternary value equal to `True` denoting "agreement".
+  static const Agree = True;
   
-  /// A ternary value denoting `Neutral`,
+  /// A ternary value denoting "neutral".
   static const Neutral = Ternary._(0, null, 'Neutral', null);
 
-  /// A ternary value denoting `False`,
-  static const False = Ternary._(-1, false, 'False', ['false', 'negative', '-', '-1']);
+  /// A ternary value denoting `false`.
+  static const False = Ternary._(-1, false, 'False', ['false', 'negative', '-', '-1', 'disagree']);
+  /// A ternary value equal to `False` denoting "disagreement".
+  static const Disagree = False;
 }

@@ -42,9 +42,11 @@ class _QuestionPageState extends State<QuestionPage> with SingleTickerProviderSt
   String whyNotValid;
   bool get notValid => whyNotValid != null;
 
-  dynamic _tmp;
-  dynamic get tmp => _tmp;
-  set tmp(dynamic newTmp) => _tmp = newTmp;
+  dynamic tmp;
+  /// These lines should be used for debugging the value of `tmp`.
+  // dynamic _tmp;
+  // dynamic get tmp => _tmp;
+  // set tmp(dynamic newTmp) => _tmp = newTmp;
 
   set tmpC(dynamic newTmp) {
     whyNotValid = state.current.test(newTmp);
@@ -114,6 +116,13 @@ class _QuestionPageState extends State<QuestionPage> with SingleTickerProviderSt
           ),
         ],
       );
+    } else if (question is EQQuestion) {
+      return RadioButtonGroup<Response>(
+            options: Response.agreementSet,
+            orientation: Axis.horizontal,
+            onSelected: (value, label) => setState(() => tmp = value),
+            itemBuilder: (context, value, label, disabled, onSelected) => RadioBoxButton(label: label, value: value, isSelected: value == tmp, onSelected: onSelected),
+          );
     }
 
     return const Text('You fcked up.');
@@ -127,7 +136,7 @@ class _QuestionPageState extends State<QuestionPage> with SingleTickerProviderSt
       alignment: MainAxisAlignment.center,
       children: [
         Text(
-          current is EQQuestion && current.when == When.Distraction && state.debug ? '|-- ${current.question} --|' : current.question,
+          current is EQQuestion && current.when == Ternary.Neutral && state.debug ? '|-- ${current.question} --|' : current.question,
           style: TextStyle(color: Colors.orangeAccent, fontWeight: FontWeight.bold, fontSize: 30.0),
         ),
         formInput(current),
@@ -211,7 +220,6 @@ class RadioBoxButton<T> extends StatelessWidget {
     @required this.value,
     @required this.label,
     @required this.isSelected,
-    @required this.length,
     @required this.onSelected,
     Key key,
   })  : assert(label != null, 'label must not be null'),
@@ -221,7 +229,6 @@ class RadioBoxButton<T> extends StatelessWidget {
   final T value;
   final String label;
   final bool isSelected;
-  final int length;
 
   @override
   Widget build(BuildContext context) {
