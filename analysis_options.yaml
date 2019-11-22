@@ -1,3 +1,5 @@
+#cSpell:includeRegExp /^[ \t]*#[ \t]*[^\n]+$/gm
+
 # Specify analysis options.
 #
 # Until there are meta linter rules, each desired lint must be explicitly enabled.
@@ -7,7 +9,7 @@
 # See the configuration guide for more
 # https://github.com/dart-lang/sdk/tree/master/pkg/analyzer#configuring-the-analyzer
 #
-# There are other similar analysis options files in the flutter repos,
+# There are other similar analysis options files in the flutter repositories,
 # which should be kept in sync with this file:
 #
 #   - analysis_options.yaml (this file)
@@ -21,8 +23,6 @@
 analyzer:
   strong-mode:
     implicit-dynamic: true
-  language:
-    enableSuperMixins: true
   errors:
     # treat missing required parameters as a warning (not a hint)
     missing_required_param: warning
@@ -34,7 +34,7 @@ analyzer:
     mixin_inherits_from_not_object: ignore
     # allow having TODOs in the code
     todo: ignore
-    # Ignore analyzer hints for updating pubspecs when using Future or
+    # Ignore analyzer hints for updating pubspec files when using Future or
     # Stream and not importing dart:async
     # Please see https://github.com/flutter/flutter/pull/24528 for details.
     sdk_version_async_exported_from_core: ignore
@@ -47,12 +47,59 @@ analyzer:
 
 linter:
   rules:
+    #### Error Rules ####
+    
+    # Avoid empty else statements.
+    - avoid_empty_else
+    
+    # Avoid print calls in production code.
+    #- avoid_print
+
+    # Avoid relative imports for files in lib/.
+    - avoid_relative_lib_imports
+
+    # Avoid returning null for Future.
+    - avoid_returning_null_for_future
+
+    # Avoid slow async dart:io methods.
+    - avoid_slow_async_io
+
+    # Avoid using web-only libraries outside Flutter web plugin packages. (experimental)
+    #- avoid_web_libraries_in_flutter
+
+    # Cancel instances of dart.async.StreamSubscription.
+    - cancel_subscriptions
+
+    # Close instances of dart.core.Sink.
+    - close_sinks
+
+    # Only reference in scope identifiers in doc comments.
+    - comment_references
+
+    # Avoid control flow in finally blocks.
+    - control_flow_in_finally
+
+    # DO reference all public properties in debug methods.
+    - diagnostic_describe_all_properties
+
+    # Avoid empty statements.
+    - empty_statements
+
+    # Always override hashCode if overriding ==.
+    - hash_and_equals
+
+    # Conditions should not unconditionally evaluate to true or to false. (experimental)
+    - invariant_booleans
+
+    # Invocation of Iterable.contains with references of unrelated types.
+    - iterable_contains_unrelated_type
+
     # these rules are documented on and in the same order as
     # the Dart Lint rules page to make maintenance easier
     # https://github.com/dart-lang/linter/blob/master/example/all.yaml
     - always_declare_return_types
     #- always_put_control_body_on_new_line
-    - always_put_required_named_parameters_first # we prefer having parameters in the same order as fields https://github.com/flutter/flutter/issues/10219
+    #- always_put_required_named_parameters_first # we prefer having parameters in the same order as fields https://github.com/flutter/flutter/issues/10219
     #- always_require_non_null_named_parameters
     #- always_specify_types
     - annotate_overrides
@@ -63,16 +110,15 @@ linter:
     #- avoid_catching_errors # why?
     #- avoid_classes_with_only_static_members # we need organization
     # - avoid_double_and_int_checks # only useful when targeting JS runtime
-    - avoid_empty_else
     - avoid_field_initializers_in_const_classes
     #- avoid_function_literals_in_foreach_calls # why?
     # - avoid_implementing_value_types # not yet tested
     - avoid_init_to_null
+    #cSpell:disable-next-line
     # - avoid_js_rounded_ints # only useful when targeting JS runtime
     - avoid_null_checks_in_equality_operators
     - avoid_positional_boolean_parameters # not yet tested
     - avoid_private_typedef_functions # we prefer having typedef (discussion in https://github.com/flutter/flutter/pull/16356)
-    - avoid_relative_lib_imports
     - avoid_renaming_method_parameters
     - avoid_return_types_on_setters
     #- avoid_returning_null # there are plenty of valid reasons to return null
@@ -82,32 +128,25 @@ linter:
     #- avoid_setters_without_getters # not yet tested && I can see use cases for setter-only properties
     # - avoid_shadowing_type_parameters # not yet tested
     # - avoid_single_cascade_in_expression_statements # not yet tested
-    - avoid_slow_async_io
     - avoid_types_as_parameter_names
     # - avoid_types_on_closure_parameters # conflicts with always_specify_types
     - avoid_unused_constructor_parameters
     - avoid_void_async
     - await_only_futures
     - camel_case_types
-    - cancel_subscriptions
     # - cascade_invocations # not yet tested
     # - close_sinks # not reliable enough
     # - comment_references # blocked on https://github.com/flutter/flutter/issues/20765
     # - constant_identifier_names # needs an opt-out https://github.com/dart-lang/linter/issues/204
-    - control_flow_in_finally
     # - curly_braces_in_flow_control_structures # not yet tested
     # - diagnostic_describe_all_properties # not yet tested
     - directives_ordering
     - empty_catches
     - empty_constructor_bodies
-    - empty_statements
-    - field_initializer_not_assignable
     # - file_names # not yet tested
     - flutter_style_todos
-    - hash_and_equals
     - implementation_imports
     # - invariant_booleans # too many false positives: https://github.com/dart-lang/linter/issues/811
-    - iterable_contains_unrelated_type
     - join_return_with_assignment # not yet tested
     - library_names
     - library_prefixes
@@ -145,8 +184,8 @@ linter:
     - prefer_final_locals
     # - prefer_for_elements_to_map_fromIterable # not yet tested
     - prefer_foreach
-    # - prefer_function_declarations_over_variables # not yet tested
-    - prefer_generic_function_type_aliases
+    - prefer_function_declarations_over_variables # not yet tested
+    #- prefer_generic_function_type_aliases
     # - prefer_if_elements_to_conditional_expressions # not yet tested
     - prefer_if_null_operators
     - prefer_initializing_formals
@@ -176,7 +215,9 @@ linter:
     - type_init_formals
     # - unawaited_futures # too many false positives
     - unnecessary_await_in_return # not yet tested
+    #cSpell:disable
     - unnecessary_brace_in_string_interps
+    #cSpell:enable
     - unnecessary_const
     - unnecessary_getters_setters
     # - unnecessary_lambdas # has false positives: https://github.com/dart-lang/linter/issues/498
