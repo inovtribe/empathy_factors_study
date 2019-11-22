@@ -10,3 +10,4 @@ ios/.generated/
 packages
 .flutter-plugins
 media/presentation.psd
+android/.gradle/
