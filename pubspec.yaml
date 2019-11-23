@@ -10,7 +10,7 @@ description: A survey app with the purpose of assisting in an investigation of h
 version: 1.0.0+1
 
 environment:
-  sdk: ">=2.4.0 <3.0.0"
+  sdk: ">=2.7.0 <3.0.0"
 
 dependencies:
   flutter:
