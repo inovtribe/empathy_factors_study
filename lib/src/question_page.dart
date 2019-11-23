@@ -177,7 +177,7 @@ class _QuestionPageState extends State<QuestionPage> with SingleTickerProviderSt
                 if (current is EQQuestion) {
                   current.add(tmp);
                 } else {
-                  store[current.key] = tmp;
+                  store[current.key] = current is NumQuestion ? tmp.clamp(current.min, current.max) : tmp;
                 }
 
                 if (state.next != null) {
