@@ -7,7 +7,7 @@
          FlutterApplication and put your custom class here. -->
     <application
         android:name="io.flutter.app.FlutterApplication"
-        android:label="Empathy & Impulse Control Survey"
+        android:label="Empathy &amp; Impulse Control Survey"
         android:icon="@mipmap/ic_launcher">
         <activity
             android:name=".MainActivity"
