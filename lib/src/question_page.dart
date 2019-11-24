@@ -80,8 +80,9 @@ class _QuestionPageState extends State<QuestionPage> {
         textInputAction: TextInputAction.done,
         keyboardType: TextInputType.numberWithOptions(decimal: question.decimal, signed: question.signed),
         onChanged: (_) {
-          if (RegExp(r'^(?:\d+|(?:\d*\.\d+))?$').hasMatch(controller.value.text)) {
-            store[question.key] = (num.tryParse(controller.value.text.isNotEmpty ? controller.value.text : '0').clamp(question.min, question.max) ?? store[question.key]).toString();
+          String txt = controller.value.text.replaceAll(RegExp(r'^\.+|\.+$'), '');
+          if (RegExp(r'^(?:\d+|(?:\d*\.\d+))?$').hasMatch(txt)) {
+            store[question.key] = (num.tryParse(txt.isNotEmpty ? txt : '0').clamp(question.min, question.max) ?? store[question.key]).toString();
           }
         },
         controller: controller,
