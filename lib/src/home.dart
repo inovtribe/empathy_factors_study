@@ -92,7 +92,7 @@ class MicrosoftProgressBar extends StatefulWidget {
   _MicrosoftProgressBarState createState() => _MicrosoftProgressBarState();
 }
 
-class _MicrosoftProgressBarState extends State<MicrosoftProgressBar> with SingleTickerProviderStateMixin, TickedAnimatedWidget<double, MicrosoftProgressBar> {
+class _MicrosoftProgressBarState extends State<MicrosoftProgressBar> with SingleTickerProviderStateMixin, TickedAnimatedWidget<double, MicrosoftProgressBar>, AutoTickedAnimatedWidget<double, MicrosoftProgressBar> {
   @override
   Widget build(BuildContext context) {
     return FixedProgressIndicator(
@@ -103,7 +103,7 @@ class _MicrosoftProgressBarState extends State<MicrosoftProgressBar> with Single
   }
 
   @override
-  final AnimationAction animationAction = AnimationAction.Repeat;
+  final AnimationAction animationAction = AnimationAction.repeat;
 
   @override
   final double animationBegin = 0;

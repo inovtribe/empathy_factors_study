@@ -6,6 +6,7 @@ import 'package:factors_empathy_survey/src/question.dart';
 import 'package:factors_empathy_survey/src/route_transitions.dart';
 import 'package:factors_empathy_survey/src/store.dart';
 import 'package:factors_empathy_survey/src/util.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -24,28 +25,32 @@ class QuestionPage extends StatefulWidget {
   }
 }
 
-class _QuestionPageState extends State<QuestionPage> with SingleTickerProviderStateMixin, TickedAnimatedWidget<double, QuestionPage> {
+class _QuestionPageState extends State<QuestionPage> {
   QuestionnaireState<Question> get state => QuestionnaireState<Question>.of(context);
-
-  @override
-  AnimationAction get animationAction => AnimationAction.Forward;
-
-  @override
-  double get animationBegin => (state.currentIndex) / state.registrar.length;
-
-  @override
-  Duration get animationDuration => const Duration(seconds: 1);
-
-  @override
-  double get animationEnd => (state.currentIndex + 1) / state.registrar.length;
 
   String whyNotValid;
   bool get notValid => whyNotValid != null;
 
   @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) => setState(initStateAnimation));
+  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+    super.debugFillProperties(properties);
+    final _state = state;
+    final current = _state.current;
+    properties.add(IntProperty('current question index', _state.currentIndex));
+    properties.add(IntProperty('current question key', current.key));
+    final v = Store()[current.key];
+    if (current is NumQuestion) {
+      properties.add(DoubleProperty('current question answer', v is double ? v : double.tryParse(v)));
+    } else if (current is StringQuestion) {
+      properties.add(StringProperty('current question answer', v));
+    } else if (current is BooleanQuestion) {
+      properties.add(FlagProperty('current question answer', value: v is bool ? v : Ternary.parse(v).equivalent));
+    } else {
+      properties.add(DiagnosticsProperty('current question answer', v));
+    }
+
+    properties.add(FlagProperty('is input valid', value: !notValid));
+    properties.add(StringProperty('why is input invalid', whyNotValid, ifEmpty: 'Input is valid.'));
   }
 
   TimeOfDay decodeTime(String string) {
@@ -74,10 +79,14 @@ class _QuestionPageState extends State<QuestionPage> with SingleTickerProviderSt
         autofocus: true,
         textInputAction: TextInputAction.done,
         keyboardType: TextInputType.numberWithOptions(decimal: question.decimal, signed: question.signed),
-        onChanged: (_) => store[question.key] = controller.value.text,
+        onChanged: (_) {
+          if (RegExp(r'^(?:\d+|(?:\d*\.\d+))?$').hasMatch(controller.value.text)) {
+            store[question.key] = (num.tryParse(controller.value.text.isNotEmpty ? controller.value.text : '0').clamp(question.min, question.max) ?? store[question.key]).toString();
+          }
+        },
         controller: controller,
         decoration: InputDecoration(hintText: question.hint),
-        inputFormatters: [WhitelistingTextInputFormatter.digitsOnly, ClampedTextInputFormatter(question.min, question.max)],
+        inputFormatters: [question.decimal ? digitsOnlyOptionalDecimal : WhitelistingTextInputFormatter.digitsOnly],
       );
     } else if (question is StringQuestion) {
       store[question.key] ??= '';
@@ -157,13 +166,10 @@ class _QuestionPageState extends State<QuestionPage> with SingleTickerProviderSt
                 width: safeArea.left + safeArea.bottom,
                 height: kLinearProgressIndicatorHeight,
               ),
-              FixedProgressIndicator(
-                value: animationValue,
-                // value: value,
-                backgroundColor: Colors.transparent,
-                color: Colors.orangeAccent,
-                inFlex: true,
-                padded: true,
+              PageProgressIndicator(
+                from: (state.currentIndex) / state.registrar.length,
+                to: (state.currentIndex + 1) / state.registrar.length,
+                duration: const Duration(seconds: 1),
               ),
               Container(
                 color: Colors.orangeAccent,
@@ -174,6 +180,59 @@ class _QuestionPageState extends State<QuestionPage> with SingleTickerProviderSt
           ),
         ],
       ),
+    );
+  }
+}
+
+class PageProgressIndicator extends StatefulWidget {
+  const PageProgressIndicator({
+    @required this.from,
+    @required this.to,
+    @required this.duration,
+    this.action = AnimationAction.forward,
+    Key key,
+  }) : super(key: key);
+
+  final double from;
+  final double to;
+  final Duration duration;
+  final AnimationAction action;
+
+  @override
+  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+    super.debugFillProperties(properties);
+    properties.add(DoubleProperty('from', from));
+    properties.add(DoubleProperty('to', to));
+    properties.add(DiagnosticsProperty('duration', duration));
+    properties.add(EnumProperty<AnimationAction>('action', action));
+  }
+
+  @override
+  _PageProgressIndicatorState createState() => _PageProgressIndicatorState();
+}
+
+class _PageProgressIndicatorState extends State<PageProgressIndicator> with SingleTickerProviderStateMixin, TickedAnimatedWidget<double, PageProgressIndicator>, AutoTickedAnimatedWidget<double, PageProgressIndicator> {
+  @override
+  double get animationBegin => widget.from;
+
+  @override
+  double get animationEnd => widget.to;
+
+  @override
+  Duration get animationDuration => widget.duration;
+
+  @override
+  AnimationAction get animationAction => widget.action;
+
+  @override
+  Widget build(BuildContext context) {
+    return FixedProgressIndicator(
+      value: animationValue,
+      // value: value,
+      backgroundColor: Colors.transparent,
+      color: Colors.orangeAccent,
+      inFlex: true,
+      padded: true,
     );
   }
 }

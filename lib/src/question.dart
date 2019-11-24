@@ -432,7 +432,7 @@ abstract class Question {
 }
 
 class NumQuestion extends Question {
-  const NumQuestion(int key, int number, String question, ValueTest test, {this.decimal = false, this.hint, this.signed = false, this.min, this.max}) : super(key, number, question, test);
+  const NumQuestion(int key, int number, String question, ValueTest test, {this.decimal = false, this.hint, this.signed = false, this.min = 0, this.max = double.maxFinite}) : super(key, number, question, test);
 
   final bool decimal;
   final bool signed;
@@ -444,7 +444,7 @@ class NumQuestion extends Question {
 }
 
 class SliderQuestion extends NumQuestion {
-  const SliderQuestion(int key, int number, String question, ValueTest test, {bool decimal = false, num min, @required num max, this.divisions}) : super(key, number, question, test, decimal: decimal, signed: false, min: min, max: max);
+  const SliderQuestion(int key, int number, String question, ValueTest test, {bool decimal = false, num min = 0, @required num max, this.divisions}) : super(key, number, question, test, decimal: decimal, signed: false, min: min, max: max);
 
   final int divisions;
 }
@@ -469,7 +469,7 @@ class RadioQuestion<E> extends Question {
       onSelected: onSelected ?? (value, label) => setState(() {
         return store[key] = value;
       }),
-      itemBuilder: (context, value, label, disabled, onSelected) => RadioBoxButton(label: label, value: value, isSelected: isSelected(value) ?? (value == store[key]), onSelected: onSelected),
+      itemBuilder: (context, value, label, disabled, onSelected) => RadioBoxButton(label: label, value: value, isSelected: isSelected != null ? isSelected(value) : (value == store[key]), onSelected: onSelected),
     );
   }
 

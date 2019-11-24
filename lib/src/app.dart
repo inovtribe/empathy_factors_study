@@ -21,7 +21,11 @@ class App extends StatelessWidget {
         ),
       ],
       child: MaterialApp(
-        theme: ThemeData(primaryColor: Colors.orangeAccent),
+        theme: ThemeData(
+          primaryColor: Colors.orangeAccent,
+
+          hintColor: Colors.grey
+        ),
         home: const HomePage(),
       ),
     );

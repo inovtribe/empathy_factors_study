@@ -54,6 +54,9 @@ class Ternary {
   static const Disagree = False;
 }
 
+/// A [WhitelistingTextInputFormatter] that takes in digits `[0-9]` only.
+WhitelistingTextInputFormatter get digitsOnlyOptionalDecimal => WhitelistingTextInputFormatter(RegExp(r'^(?:\d+|(?:\d*\.\d*))?$'));
+
 class ClampedTextInputFormatter extends TextInputFormatter {
   ClampedTextInputFormatter(this.min, this.max);
 
@@ -61,7 +64,9 @@ class ClampedTextInputFormatter extends TextInputFormatter {
   final num max;
 
   @override
-  TextEditingValue formatEditUpdate(TextEditingValue oldValue, TextEditingValue newValue) => _selectionAwareTextManipulation(newValue, (string) => num.parse(string).clamp(min, max).toString());
+  TextEditingValue formatEditUpdate(TextEditingValue oldValue, TextEditingValue newValue) => _selectionAwareTextManipulation(newValue, (string) {
+    return num.parse(string.isNotEmpty ? string : '0').clamp(min, max).toString();
+  });
 }
 
 TextEditingValue _selectionAwareTextManipulation(
