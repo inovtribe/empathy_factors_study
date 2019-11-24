@@ -14,7 +14,7 @@ class HomePage extends StatelessWidget {
   const HomePage({Key key, this.start = true}) : super(key: key);
 
   static void navigate(BuildContext context, bool start) {
-    Navigator.of(context).push(
+    Navigator.of(context).pushReplacement(
       PlainRoute(
         pageBuilder: (context, animation, secondaryAnimation) => HomePage(start: start),
       ),
@@ -31,6 +31,8 @@ class HomePage extends StatelessWidget {
     // });
     if (start) {
       await Store.load(File('${(await getExternalStorageDirectory()).path}/empathy-quotient.csv'));
+    } else {
+      await Store().save();
     }
     return true;
   }

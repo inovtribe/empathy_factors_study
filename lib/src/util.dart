@@ -1,3 +1,4 @@
+import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 
 /// Returns the [EdgeInsets] defining the safe area for `context`.
@@ -51,4 +52,56 @@ class Ternary {
   static const False = Ternary._(-1, false, 'False', ['false', 'negative', '-', '-1', 'disagree']);
   /// A ternary value equal to `False` denoting "disagreement".
   static const Disagree = False;
+}
+
+class ClampedTextInputFormatter extends TextInputFormatter {
+  ClampedTextInputFormatter(this.min, this.max);
+
+  final num min;
+  final num max;
+
+  @override
+  TextEditingValue formatEditUpdate(TextEditingValue oldValue, TextEditingValue newValue) => _selectionAwareTextManipulation(newValue, (string) => num.parse(string).clamp(min, max).toString());
+}
+
+TextEditingValue _selectionAwareTextManipulation(
+  TextEditingValue value,
+  String substringManipulation(String substring),
+) {
+  final int selectionStartIndex = value.selection.start;
+  final int selectionEndIndex = value.selection.end;
+  String manipulatedText;
+  TextSelection manipulatedSelection;
+  if (selectionStartIndex < 0 || selectionEndIndex < 0) {
+    manipulatedText = substringManipulation(value.text);
+  } else {
+    final String beforeSelection = substringManipulation(
+      value.text.substring(0, selectionStartIndex)
+    );
+    final String inSelection = substringManipulation(
+      value.text.substring(selectionStartIndex, selectionEndIndex)
+    );
+    final String afterSelection = substringManipulation(
+      value.text.substring(selectionEndIndex)
+    );
+    manipulatedText = beforeSelection + inSelection + afterSelection;
+    if (value.selection.baseOffset > value.selection.extentOffset) {
+      manipulatedSelection = value.selection.copyWith(
+        baseOffset: beforeSelection.length + inSelection.length,
+        extentOffset: beforeSelection.length,
+      );
+    } else {
+      manipulatedSelection = value.selection.copyWith(
+        baseOffset: beforeSelection.length,
+        extentOffset: beforeSelection.length + inSelection.length,
+      );
+    }
+  }
+  return TextEditingValue(
+    text: manipulatedText,
+    selection: manipulatedSelection ?? const TextSelection.collapsed(offset: -1),
+    composing: manipulatedText == value.text
+        ? value.composing
+        : TextRange.empty,
+  );
 }

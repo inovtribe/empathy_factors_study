@@ -60,3 +60,50 @@ class RadioButtonGroup<T> extends StatelessWidget {
     );
   }
 }
+
+class RadioBoxButton<T> extends StatelessWidget {
+  final OnRadioButtonSelected<T> onSelected;
+
+  const RadioBoxButton({
+    @required this.value,
+    @required this.label,
+    @required this.isSelected,
+    @required this.onSelected,
+    Key key,
+  })  : assert(label != null, 'label must not be null'),
+        assert(value != null, 'value must not be null'),
+        super(key: key);
+
+  final T value;
+  final String label;
+  final bool isSelected;
+
+  @override
+  Widget build(BuildContext context) {
+    return Expanded(
+      child: InkWell(
+        onTap: () => onSelected(value, label),
+        enableFeedback: true,
+        splashColor: Colors.transparent,
+        child: Container(
+          margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
+          alignment: Alignment.center,
+          decoration: BoxDecoration(
+            color: isSelected ? Colors.orangeAccent : Colors.transparent,
+            borderRadius: const BorderRadius.all(Radius.circular(2.5)),
+          ),
+          child: Text(
+            label,
+            softWrap: true,
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: 17.0,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+

@@ -29,7 +29,7 @@ class Store {
     _instance = Store._(file, parseCsv(await file.readAsString()).asMap().map<DateTime, List<dynamic>>((_, e) => MapEntry(DateTime.parse(e[0]), e.skip(1).toList())));
   }
 
-  void start(DateTime dateTime, {int len = 32}) {
+  void start(DateTime dateTime, {int len = 66}) {
     current = dateTime;
     data[current] = List(len);
     data[current][EQQuestion.KEY] = 0;

@@ -1,3 +1,4 @@
+import 'package:factors_empathy_survey/src/radio_button_group.dart';
 import 'package:factors_empathy_survey/src/store.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -7,6 +8,8 @@ import 'util.dart';
 
 String nullTest(dynamic value) => value == null ? 'Must not be null.' : null;
 String emptyTest(dynamic value) => value == null || value.isEmpty ? 'Must not be empty.' : null;
+
+enum Gender { Male, Female }
 
 class Response {
   const Response(this.label, this.when, this.value);
@@ -20,12 +23,34 @@ class Response {
   static const SlightlyDisagree = Response('Slightly Disagree', Ternary.Disagree, 1);
   static const StronglyDisagree = Response('Strongly Disagree', Ternary.Disagree, 2);
 
+  static const Set<Response> responseSet = {
+    StronglyAgree,
+    SlightlyAgree,
+    SlightlyDisagree,
+    StronglyDisagree,
+  };
+
+  static const List<Response> responseList = [
+    StronglyAgree,
+    SlightlyAgree,
+    SlightlyDisagree,
+    StronglyDisagree,
+  ];
+
   /// A set of responses for how much a person agrees with something.
-  static const Map<Response, String> agreementSet = {
+  static const Map<Response, String> responsesToLabels = {
     StronglyAgree: 'Strongly Agree',
     SlightlyAgree: 'Slightly Agree',
     SlightlyDisagree: 'Slightly Disagree',
     StronglyDisagree: 'Strongly Disagree',
+  };
+
+  /// A set of responses for how much a person agrees with something.
+  static const Map<String, Response> labelsToResponses = {
+    'Strongly Agree': StronglyAgree,
+    'Slightly Agree': SlightlyAgree,
+    'Slightly Disagree': SlightlyDisagree,
+    'Strongly Disagree': StronglyDisagree,
   };
 }
 
@@ -323,12 +348,12 @@ const empathyQuotientDistractionRegistrar = QuestionRegistrar<EQQuestion>.of([
 
 QuestionRegistrar<EQQuestion> get distractedEmpathyQuotientRegistrar => QuestionRegistrar.of([...empathyQuotientRegistrar.registry, ...empathyQuotientDistractionRegistrar.registry]..sort((a, b) => a.number.compareTo(b.number)));
 
-
 const correlationRegistrar = QuestionRegistrar<Question>.of([
   NumQuestion(1, 1, 'On average, how much time each day do you play video games?', emptyTest, decimal: true, max: 24, hint: 'Hours'),
   NumQuestion(2, 2, 'On average, how much time each day do you play violent video games?', emptyTest, decimal: true, max: 24, hint: 'Hours'),
   NumQuestion(3, 3, 'If put in an empty room, how long would you take to resort to self harm for stimulation', emptyTest, decimal: true, hint: 'Minutes'),
   NumQuestion(4, 4, 'What is your age?', emptyTest, hint: 'Years'),
+  RadioQuestion(5, 5, 'What is your biological gender?', {Gender.Male: 'Male', Gender.Female: 'Female'}),
 ]);
 
 QuestionRegistrar<Question> get mixedRegistrar => QuestionRegistrar.of([...empathyQuotientRegistrar.registry.toList()..shuffle(), ...correlationRegistrar.registry]);
@@ -393,7 +418,6 @@ class QuestionnaireState<Q extends Question> {
 /// Given `value`, return null if valid or a non-null `String` denoting a reason why if invalid.
 typedef String ValueTest(dynamic value);
 
-
 /// A question with a key for storage, number for sorting, string for the actual question and [ValueTest] for testing a user's answer.
 abstract class Question {
   const Question(this.key, this.number, this.question, this.test);
@@ -405,22 +429,6 @@ abstract class Question {
 
   @override
   String toString() => question;
-}
-
-class EQQuestion extends Question {
-  const EQQuestion(int number, String question, this.when) : super(KEY, number, question, _test);
-
-  final Ternary when;
-
-  static String _test(dynamic value) => value == null ? 'Please choose an option.' : null;
-
-  void add(Response response) {
-    if (when == response.when) {
-      Store()[key] += response.value;
-    }
-  }
-
-  static const int KEY = 0;
 }
 
 class NumQuestion extends Question {
@@ -436,7 +444,7 @@ class NumQuestion extends Question {
 }
 
 class SliderQuestion extends NumQuestion {
-  SliderQuestion(int key, int number, String question, ValueTest test, {bool decimal = false, num min, @required num max, this.divisions}) : super(key, number, question, test, decimal: decimal, signed: false, min: min, max: max);
+  const SliderQuestion(int key, int number, String question, ValueTest test, {bool decimal = false, num min, @required num max, this.divisions}) : super(key, number, question, test, decimal: decimal, signed: false, min: min, max: max);
 
   final int divisions;
 }
@@ -447,6 +455,45 @@ class StringQuestion extends Question {
   final String hint;
 }
 
-class BooleanQuestion extends Question {
-  const BooleanQuestion(int key, int number, String question, ValueTest test) : super(key, number, question, test);
+typedef void VoidCallbackCallback(VoidCallback callback);
+
+class RadioQuestion<E> extends Question {
+  const RadioQuestion(int key, int number, String question, this.choices, {ValueTest test = _test}) : super(key, number, question, test);
+
+  final Map<E, String> choices;
+
+  Widget build(BuildContext context, VoidCallbackCallback setState, Store store, [OnRadioButtonSelected<E> onSelected, bool Function(E value) isSelected]) {
+    return RadioButtonGroup<E>(
+      options: choices,
+      orientation: Axis.horizontal,
+      onSelected: onSelected ?? (value, label) => setState(() {
+        return store[key] = value;
+      }),
+      itemBuilder: (context, value, label, disabled, onSelected) => RadioBoxButton(label: label, value: value, isSelected: isSelected(value) ?? (value == store[key]), onSelected: onSelected),
+    );
+  }
+
+  static String _test(dynamic value) => value == null ? 'Please choose an option.' : null;
+}
+
+class EQQuestion extends RadioQuestion<Response> {
+  const EQQuestion(int number, String question, this.when, {ValueTest test = RadioQuestion._test}) : super(number, number, question, Response.responsesToLabels, test: test);
+
+  final Ternary when;
+
+  @override
+  Widget build(BuildContext context, VoidCallbackCallback setState, Store store, [OnRadioButtonSelected<Response> onSelected, bool Function(Response value) isSelected]) => super.build(context, setState, store, (response, label) => setState(() {
+    final r = Response.labelsToResponses[store[key]];
+      store[KEY] -= r != null && r.when == when ? r.value : 0;
+      store[key] = response.label;
+      store[KEY] += when == response.when ? response.value : 0;
+    }), (value) {
+      return store[key] == value.label;
+    });
+
+  static const int KEY = 0;
+}
+
+class BooleanQuestion extends RadioQuestion<bool> {
+  const BooleanQuestion(int key, int number, String question, {ValueTest test = RadioQuestion._test}) : super(key, number, question, const {true: 'True', false: 'False'}, test: test);
 }
