@@ -11,3 +11,4 @@ packages
 .flutter-plugins
 media/presentation.psd
 ios/Flutter/flutter_export_environment.sh
+**/key.properties
