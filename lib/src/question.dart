@@ -349,11 +349,11 @@ const empathyQuotientDistractionRegistrar = QuestionRegistrar<EQQuestion>.of([
 QuestionRegistrar<EQQuestion> get distractedEmpathyQuotientRegistrar => QuestionRegistrar.of([...empathyQuotientRegistrar.registry, ...empathyQuotientDistractionRegistrar.registry]..sort((a, b) => a.number.compareTo(b.number)));
 
 const correlationRegistrar = QuestionRegistrar<Question>.of([
-  NumQuestion(1, 1, 'On average, how much time each day do you play video games?', emptyTest, decimal: true, max: 24, hint: 'Hours'),
-  NumQuestion(2, 2, 'On average, how much time each day do you play violent video games?', emptyTest, decimal: true, max: 24, hint: 'Hours'),
-  NumQuestion(3, 3, 'If put in an empty room, how long would you take to resort to self harm for stimulation', emptyTest, decimal: true, hint: 'Minutes'),
-  NumQuestion(4, 4, 'What is your age?', emptyTest, hint: 'Years'),
-  RadioQuestion(5, 5, 'What is your biological gender?', {Gender.Male: 'Male', Gender.Female: 'Female'}),
+  NumQuestion(61, 1, 'On average, how much time each day do you play video games?', emptyTest, decimal: true, max: 24, hint: 'Hours'),
+  NumQuestion(62, 2, 'On average, how much time each day do you play violent video games?', emptyTest, decimal: true, max: 24, hint: 'Hours'),
+  NumQuestion(63, 3, 'If put in an empty room, how long would you take to resort to self harm for stimulation', emptyTest, decimal: true, hint: 'Minutes'),
+  NumQuestion(64, 4, 'What is your age?', emptyTest, hint: 'Years'),
+  RadioQuestion(65, 5, 'What is your biological gender?', {Gender.Male: 'Male', Gender.Female: 'Female'}),
 ]);
 
 QuestionRegistrar<Question> get mixedRegistrar => QuestionRegistrar.of([...empathyQuotientRegistrar.registry.toList()..shuffle(), ...correlationRegistrar.registry]);
