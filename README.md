@@ -1,3 +1,3 @@
-# Factors for Empathy Survey
+# Empathy Factors Study 
 
-A survey app with the purpose of assisting in an investigation of how various factors affect a person's empathy.
+A survey app with the purpose of aiding data collection in an investigation into how various factors affect a person's empathy.

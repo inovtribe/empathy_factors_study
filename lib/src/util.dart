@@ -55,7 +55,7 @@ class Ternary {
 }
 
 /// A [WhitelistingTextInputFormatter] that takes in digits `[0-9]` only.
-WhitelistingTextInputFormatter get digitsOnlyOptionalDecimal => WhitelistingTextInputFormatter(RegExp(r'^(?:\d+|(?:\d*\.\d*))?$'));
+WhitelistingTextInputFormatter digitsOnly(bool decimal, bool signed) => WhitelistingTextInputFormatter(RegExp(r'\d+' + (signed ? '|-' : '') + (decimal ? r'|\.' : '')));
 
 class ClampedTextInputFormatter extends TextInputFormatter {
   ClampedTextInputFormatter(this.min, this.max);

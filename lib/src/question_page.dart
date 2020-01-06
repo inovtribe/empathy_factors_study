@@ -72,22 +72,17 @@ class _QuestionPageState extends State<QuestionPage> {
         divisions: question.divisions,
       );
     } else if (question is NumQuestion) {
-      store[question.key] ??= '0';
+      store[question.key] ??= '';
       final controller = TextEditingController(text: store[question.key]);
       return TextField(
         autocorrect: true,
         autofocus: true,
         textInputAction: TextInputAction.done,
         keyboardType: TextInputType.numberWithOptions(decimal: question.decimal, signed: question.signed),
-        onChanged: (_) {
-          String txt = controller.value.text.replaceAll(RegExp(r'^\.+|\.+$'), '');
-          if (RegExp(r'^(?:\d+|(?:\d*\.\d+))?$').hasMatch(txt)) {
-            store[question.key] = (num.tryParse(txt.isNotEmpty ? txt : '0').clamp(question.min, question.max) ?? store[question.key]).toString();
-          }
-        },
+        onChanged: (_) => store[question.key] = controller.value.text,
         controller: controller,
         decoration: InputDecoration(hintText: question.hint),
-        inputFormatters: [question.decimal ? digitsOnlyOptionalDecimal : WhitelistingTextInputFormatter.digitsOnly],
+        inputFormatters: [digitsOnly(question.decimal, question.signed)],
       );
     } else if (question is StringQuestion) {
       store[question.key] ??= '';

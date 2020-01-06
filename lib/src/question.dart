@@ -349,10 +349,10 @@ const empathyQuotientDistractionRegistrar = QuestionRegistrar<EQQuestion>.of([
 QuestionRegistrar<EQQuestion> get distractedEmpathyQuotientRegistrar => QuestionRegistrar.of([...empathyQuotientRegistrar.registry, ...empathyQuotientDistractionRegistrar.registry]..sort((a, b) => a.number.compareTo(b.number)));
 
 const correlationRegistrar = QuestionRegistrar<Question>.of([
-  NumQuestion(61, 1, 'On average, how much time each day do you play video games?', emptyTest, decimal: true, max: 24, hint: 'Hours'),
-  NumQuestion(62, 2, 'On average, how much time each day do you play violent video games?', emptyTest, decimal: true, max: 24, hint: 'Hours'),
-  NumQuestion(63, 3, 'If put in an empty room, how long would you take to resort to self harm for stimulation', emptyTest, decimal: true, hint: 'Minutes'),
-  NumQuestion(64, 4, 'What is your age?', emptyTest, hint: 'Years'),
+  NumQuestion(61, 1, 'On average, how much time each day do you play video games?', decimal: true, max: 24, hint: 'Hours'),
+  NumQuestion(62, 2, 'On average, how much time each day do you play violent video games?', decimal: true, max: 24, hint: 'Hours'),
+  NumQuestion(63, 3, 'If put in an empty room, how long would you take to resort to self harm (scratching, biting lip, ripping hair) for stimulation', decimal: true, hint: 'Minutes'),
+  NumQuestion(64, 4, 'What is your age?', hint: 'Years'),
   RadioQuestion(65, 5, 'What is your biological gender?', {Gender.Male: 'Male', Gender.Female: 'Female'}),
 ]);
 
@@ -420,19 +420,19 @@ typedef String ValueTest(dynamic value);
 
 /// A question with a key for storage, number for sorting, string for the actual question and [ValueTest] for testing a user's answer.
 abstract class Question {
-  const Question(this.key, this.number, this.question, this.test);
+  const Question(this.key, this.number, this.question);
 
   final int key;
   final int number;
   final String question;
-  final ValueTest test;
+  ValueTest get test;
 
   @override
   String toString() => question;
 }
 
 class NumQuestion extends Question {
-  const NumQuestion(int key, int number, String question, ValueTest test, {this.decimal = false, this.hint, this.signed = false, this.min = 0, this.max = double.maxFinite}) : super(key, number, question, test);
+  const NumQuestion(int key, int number, String question, {this.decimal = false, this.hint, this.signed = false, this.min = 0, this.max = double.maxFinite}) : super(key, number, question);
 
   final bool decimal;
   final bool signed;
@@ -441,26 +441,44 @@ class NumQuestion extends Question {
   final num max;
 
   final String hint;
+
+  @override
+  ValueTest get test => (dynamic value) {
+    final text = value as String;
+    if (text == null) return 'Must not be null';
+    else if (text.isEmpty) return 'Must not be empty';
+    else if (RegExp(r'^\.{2,}|\.+$').hasMatch(text)) return 'Must start and end with a number';
+    else if (!RegExp('^' + (signed ? '-?' : '') + (decimal ? r'\d*\.?' : '') + r'\d+$').hasMatch(text)) return 'Must be a number in the form (-)0...(.0...)';
+    else if (num.tryParse(text) > max || num.tryParse(text) < min) return 'Must be at least $min and at most $max';
+    
+    return null;
+  };
 }
 
 class SliderQuestion extends NumQuestion {
-  const SliderQuestion(int key, int number, String question, ValueTest test, {bool decimal = false, num min = 0, @required num max, this.divisions}) : super(key, number, question, test, decimal: decimal, signed: false, min: min, max: max);
+  const SliderQuestion(int key, int number, String question, {bool decimal = false, num min = 0, @required num max, this.divisions}) : super(key, number, question, decimal: decimal, signed: false, min: min, max: max);
 
   final int divisions;
 }
 
 class StringQuestion extends Question {
-  const StringQuestion(int key, int number, String question, ValueTest test, {this.hint}) : super(key, number, question, test);
+  const StringQuestion(int key, int number, String question, this.test, {this.hint}) : super(key, number, question);
 
   final String hint;
+
+  @override
+  final ValueTest test;
 }
 
 typedef void VoidCallbackCallback(VoidCallback callback);
 
 class RadioQuestion<E> extends Question {
-  const RadioQuestion(int key, int number, String question, this.choices, {ValueTest test = _test}) : super(key, number, question, test);
+  const RadioQuestion(int key, int number, String question, this.choices, {this.test = _test}) : super(key, number, question);
 
   final Map<E, String> choices;
+
+  @override
+  final ValueTest test;
 
   Widget build(BuildContext context, VoidCallbackCallback setState, Store store, [OnRadioButtonSelected<E> onSelected, bool Function(E value) isSelected]) {
     return RadioButtonGroup<E>(
